@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ensia Student Performance Predictor</title>
+    <link href="{{ url_for('static', filename='styles/style.css') }}" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="left-container">
+            <h2>Welcome to the Ensia Student Performance Predictor!</h2>
+            <p>This website predicts the performance of Ensia students based on various factors and data analysis.</p>
+        </div>
+        <div class="right-container">
+            <div class="form-container">
+                <p>Please sign up using your Ensia email address.</p>
+                <form id="emailForm" method="post">
+                    <input type="email" id="email" name="email" placeholder="Enter your Ensia email" required>
+                    <input type="submit" value="Send Verification Code">
+                </form>
+                <form id="verificationForm" style="display: none;">
+                    <input type="text" id="code" name="code" placeholder="Enter verification code" required>
+                    <input type="submit" value="Verify">
+                </form>
+                <div id="verificationResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('emailForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var email = document.getElementById('email').value;
+            fetch('/send_verification_email', {
+                method: 'POST',
+                body: new URLSearchParams({ email: email }),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Verification code sent successfully') {
+                    document.getElementById('emailForm').style.display = 'none';
+                    document.getElementById('verificationForm').style.display = 'block';
+                }
+            });
+        });
+
+        document.getElementById('verificationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var email = document.getElementById('email').value;
+            var code = document.getElementById('code').value;
+            fetch('/verify_email', {
+                method: 'POST',
+                body: new URLSearchParams({ email: email, code: code }),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.verified) {
+                    document.getElementById('verificationResult').innerText = 'Email verified successfully!';
+                } else {
+                    document.getElementById('verificationResult').innerText = 'Invalid verification code. Please try again.';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
