@@ -1,64 +1,61 @@
-from flask import Flask, render_template, request, jsonify
-from flask_mail import Mail, Message
+from flask import Flask, flash, render_template, request, jsonify, session
 import random
+import firebase_admin
+from firebase_admin import credentials, auth
+import sendgrid
+from sendgrid.helpers.mail import Mail
+from flask import Flask, request, render_template, redirect, url_for
+import bcrypt
 import os
 
+
 app = Flask(__name__)
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = os.getenv("account_email")
-app.config['MAIL_PASSWORD'] = os.getenv("account_pwd")      
-
-mail = Mail(app)
+app.secret_key = os.urandom(24).hex()
 
 
-def generate_verification_code():
-    return str(random.randint(100000, 999999))
-
-verification_codes = {}
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/send_verification_email', methods=['POST'])
-def send_verification_email():
+@app.route('/register', methods=['POST'])
+def register():
     email = request.form['email']
-    verification_code = generate_verification_code()
-    verification_codes[email] = verification_code
+    if email.endswith('@ensia.edu.dz'):
+        # Extract surname and name from the email
+        parts = email.split('@')[0].split('.')
+        surname, name = parts[0], parts[1]
 
-    # Send email
-    msg = Message('Email Verification', recipients=[email])
-    msg.body = f'Your verification code is: {verification_code}'
-    mail.send(msg)
+        # Save details in session
+        session['email'] = email
+        session['name'] = name.upper()  
+        session['surname'] = surname.upper() 
 
-    return jsonify({'message': 'Verification code sent successfully'})
-
-@app.route('/verify_email', methods=['POST'])
-def verify_email():
-    email = request.form['email']
-    code = request.form['code']
-    if email in verification_codes and verification_codes[email] == code:
-        return jsonify({'verified': True})
+        # Redirect to the next page
+        return redirect(url_for('form'))
     else:
-        return jsonify({'verified': False})
-@app.route('/Form')
-def show_form():
+        flash('You should use your ENSIA email. Please try again.')
+        return redirect(url_for('index'))
+    
+
+@app.route('/form')
+def form():
     return render_template('form.html')
 
-"""@app.route('/form2.html')
-def show_form_2():
-    return render_template('form2.html')"""
+@app.route('/results')
+def results():
+    email = session.get('email')
+    name = session.get('name')
+    surname = session.get('surname')
 
-@app.route('/submit', methods=['POST'])
-def process_form():
-    gender = request.form['question1']
-    specialty = request.form['question2']
-    hours_studying = int(request.form['question3'])
+    if not email or not name or not surname:
+        flash('Session data missing, please register again.')
+        return redirect(url_for('index'))
 
-    output = f"You are a {gender}, studying in the {specialty} specialty , you spend {hours_studying} hours studying per week."
-    return output
+    return render_template('results.html', email=email, name=name, surname=surname)
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

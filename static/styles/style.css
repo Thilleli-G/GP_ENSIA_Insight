@@ -60,7 +60,7 @@ input[type="password"]:focus {
     box-shadow: #a6a5a5;
 }
 
-input[type="submit"] {
+button[type="submit"] {
     background-color: #d8a31c;
     color: white;
     padding: 10px 20px;
@@ -71,6 +71,12 @@ input[type="submit"] {
     margin-top: 40px; 
 }
 
-input[type="submit"]:hover {
+button[type="submit"]:hover {
     background-color: #e3cd92;
+}
+
+.flash-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 5px;
 }
