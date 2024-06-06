@@ -48,10 +48,8 @@ def results():
     name = session.get('name')
     surname = session.get('surname')
 
-    if email and name and surname:
-        return render_template('results.html', name=name, surname=surname)
-    else:
-        return "Session data missing, please register again."
+
+    return render_template('results.html', name=name, surname=surname)
 
 
 
