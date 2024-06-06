@@ -45,7 +45,9 @@
             <div class="banner-section section parallax-window" data-parallax="scroll" data-image-src="img/section-1-bg.png" id="section-1">
                 <div class="container">
                     <div class="item">
-                        <p>Student's Name: <strong>{{ name }}</strong> <strong>{{ surname }}</strong></p>
+                        {% if name and surname and email %}
+                            <p>Student's Name: <strong>{{ name }} {{ surname }}</strong></p>
+                        {% endif %}
                         <div class="bg-blue-transparent logo-fa"><span>YOUR RESULTS ARE READY!!</span> </div>
                         <div class="bg-blue-transparent simple"><p>Based on our analysis of your performance, we expect you to achieve a strong outcome in the next semester. 
                             Keep up the hard work and focus on areas for improvement to potentially reach exceptional results.</p></div>
