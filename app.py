@@ -49,7 +49,7 @@ def results():
     surname = session.get('surname')
 
 
-    return render_template('results.html', name=name, surname=surname)
+    return render_template('results.html')
 
 
 
