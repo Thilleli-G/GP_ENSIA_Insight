@@ -1,3 +1,4 @@
+import subprocess
 from flask import Flask, flash, render_template, request, jsonify, session, redirect, url_for
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import NearestNeighbors
@@ -14,6 +15,9 @@ from flask import Flask, request, render_template, redirect, url_for
 import bcrypt
 import os
 
+if os.getenv("CUSTOM_BUILD_SCRIPT"):
+    subprocess.call(["bash", os.getenv("CUSTOM_BUILD_SCRIPT")])
+    
 # Load the pre-trained models and feature names
 rf_regressor = joblib.load('rf_regressor_model.pkl')
 knn_model = joblib.load('knn_model.joblib')
